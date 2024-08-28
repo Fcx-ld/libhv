@@ -2,16 +2,17 @@
 list(APPEND STUDY
     StudyTest
 )
-f(WITH_EVPP)
+if(WITH_EVPP)
     include_directories(../cpputil ../evpp)
 
     # StudyTest
     add_executable(StudyTest StudyTest.cpp)
     target_link_libraries(StudyTest ${HV_LIBRARIES})
+endif()
 
 include_directories(.. ../base ../ssl ../event ../util)
-add_executable(StudyTest StudyTest.cpp)
-target_link_libraries(StudyTest ${HV_LIBRARIES})
+# add_executable(StudyTest StudyTest.cpp)
+# target_link_libraries(StudyTest ${HV_LIBRARIES})
 
 # 使用add_custom_target(...)命令创建一个自定义目标examples，它依赖于EXAMPLES列表中的所有可执行文件。这允许用户通过构建examples目标来编译所有的示例程序。
 add_custom_target(study DEPENDS ${STUDY})

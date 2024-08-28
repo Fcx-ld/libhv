@@ -29,6 +29,8 @@ option(WITH_MBEDTLS "with mbedtls library" OFF)
 
 option(WITH_KCP "compile event/kcp" OFF)
 
+option(STUDY "study project" ON)
+
 if(WIN32 OR MINGW)
     option(WITH_WEPOLL "compile event/wepoll -> use iocp" ON)
     option(ENABLE_WINDUMP "Windows MiniDumpWriteDump" OFF)
@@ -109,6 +111,7 @@ set(CMAKE_C_STANDARD_REQUIRED True)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
+# 这行代码会告诉系统 INCDIR 变量应该指向 include 目录
 set(INCDIR include)
 set(SRCDIR src)
 set(LIBDIR lib)
@@ -117,12 +120,13 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${LIBDIR})
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${LIBDIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${BINDIR})
 message(STATUS "CMAKE_LIBRARY_OUTPUT_DIRECTORY=${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
-
+#[[include_directories 来添加头文件的搜索路径。指定编译器在编译过程中搜索头文件的路径。
+使用 link_directories 来添加库文件的搜索路径。链接器在链接过程中搜索库文件的路径。]]
 set(INCDIRS . include 3rd/include)
 set(LIBDIRS . lib 3rd/lib)
 include_directories(${INCDIRS} ${SRCDIR})
 link_directories(${LIBDIRS})
-
+# 当你使用 add_definitions(-DDEBUG) 时，你正在向编译器添加一个定义 -DDEBUG。这通常意味着你想要启用调试模式。
 message(STATUS "CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}")
 if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
     add_definitions(-DDEBUG)
@@ -295,6 +299,10 @@ if(BUILD_EXAMPLES)
     file(INSTALL etc DESTINATION ${CMAKE_BINARY_DIR})
     file(INSTALL etc DESTINATION ${CMAKE_BINARY_DIR}/bin)
     file(INSTALL etc DESTINATION ${CMAKE_BINARY_DIR}/examples)
+endif()
+
+if(STUDY)
+ add_subdirectory(study)
 endif()
 
 if(BUILD_UNITTEST)
