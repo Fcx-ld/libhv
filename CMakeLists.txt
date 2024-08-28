@@ -34,15 +34,29 @@ if(WIN32 OR MINGW)
     option(ENABLE_WINDUMP "Windows MiniDumpWriteDump" OFF)
     option(BUILD_FOR_MT "build for /MT" OFF)
     if(BUILD_FOR_MT)
+        #[[在CMake脚本中，这行命令的作用是为调试配置（Debug）设置C编译器的标志。具体来说：
+
+CMAKE_C_FLAGS_DEBUG 是一个CMake预定义的变量，它包含了用于调试构建类型的C编译器的命令行选项。
+
+"/MTd" 是一个编译器标志，专门用于Microsoft Visual C++编译器，它指示编译器生成调试信息，并使用静态链接的CRT（C Runtime）库。/MTd标志与多线程调试版本的CRT库链接，而/MDd则与动态链接的CRT库链接。
+
+${CMAKE_C_FLAGS_DEBUG} 表示当前为调试配置设置的C编译器标志的值。
+
+set(...) 命令用于设置变量的值。这里它将现有的 CMAKE_C_FLAGS_DEBUG 值与 /MTd 标志连接起来，用空格分隔。
+
+此命令通常用于Windows平台，当你希望在Debug模式下使用静态链接的CRT库时。使用静态链接的CRT库可以避免DLL地狱（依赖于特定版本的DLL），并且有时可以提供更清晰的错误信息，因为所有必要的CRT代码都包含在最终的可执行文件中。
+
+请注意，如果你的项目中同时使用了 /MT 和 /MD 标志（分别用于Release和Debug配置），你需要确保所有项目文件都使用相同的CRT库类型，以避免运行时错误]]
         set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} /MTd")
         set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")
         set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /MT")
         set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
     endif()
 endif()
-
+# message(STATUS ...) 命令输出当前的CMake变量值，有助于调试和确认配置状态
 message(STATUS "CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR}")
 message(STATUS "CMAKE_CURRENT_SOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR}")
+# STREQUAL 是一个内置的条件运算符，用于比较两个字符串是否完全相同。
 if(NOT "${CMAKE_CURRENT_SOURCE_DIR}" STREQUAL "${CMAKE_SOURCE_DIR}")
     set(BUILD_EXAMPLES OFF)
 endif()
@@ -85,7 +99,8 @@ check_function("pipe" "unistd.h")
 check_function("socketpair" "sys/socket.h")
 check_function("eventfd" "sys/eventfd.h")
 check_function("setproctitle" "unistd.h")
-
+# configure_file 是 CMake 中的一个命令，用于将一个源文件复制到另一个位置，并在这个过程中执行变量替换。
+# CMake 会查找 hconfig.h.in 文件中的特殊标记（例如 @VAR@），这些标记对应于 CMake 变量 VAR 的值。CMake 将自动替换这些标记为它们的实际值。
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/hconfig.h.in ${CMAKE_CURRENT_SOURCE_DIR}/hconfig.h)
 
 # see Makefile.in
@@ -260,7 +275,13 @@ endif()
 
 install(FILES ${LIBHV_HEADERS} DESTINATION include/hv)
 install(EXPORT libhvConfig DESTINATION lib/cmake/libhv)
+#[[定义变量: 定义了一个名为 HV_LIBRARIES 的变量，其值为 hv。这里 hv 可能代表一个库的名称，例如一个动态链接库（DLL）或静态库（LIB），具体取决于项目环境和库的实现。
 
+缓存变量: 使用 CACHE 关键字将 HV_LIBRARIES 变量设置为一个缓存变量。缓存变量的值在CMake配置过程中被保存，并且在后续的配置中保持不变，除非明确地改变它。这有助于加快构建过程，因为CMake不需要每次都重新计算这些值。
+
+内部文档: INTERNAL 表示这个变量是供项目内部使用的，不会暴露给外部用户。这通常用于避免用户在配置项目时不小心修改这些变量。
+
+文档字符串: 通过双引号提供的字符串 "link hv libraries" 为变量提供了一个文档字符串，这有助于在CMake GUI或通过 cmake -LH 命令查看时提供额外的上下文信息。]]
 if(BUILD_SHARED)
     set(HV_LIBRARIES hv CACHE INTERNAL "link hv libraries")
 else()
