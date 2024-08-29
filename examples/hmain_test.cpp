@@ -15,6 +15,7 @@
  *
  */
 
+// main_ctx_init main入口初始化
 typedef struct conf_ctx_s {
     IniParser* parser;
     int loglevel;
@@ -24,6 +25,7 @@ typedef struct conf_ctx_s {
 } conf_ctx_t;
 conf_ctx_t g_conf_ctx;
 
+// inline 关键字意味着编译器可以优化调用这个函数，将其直接展开到调用点，以减少函数调用的开销。
 inline void conf_ctx_init(conf_ctx_t* ctx) {
     ctx->parser = new IniParser;
     ctx->loglevel = LOG_LEVEL_DEBUG;
