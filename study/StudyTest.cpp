@@ -11,7 +11,7 @@ int main() {
     get_executable_path(exe_filepath, sizeof(exe_filepath));
     // 获取运行目录
     get_run_dir(run_dir, sizeof(run_dir));
-
+     
     printf("exe_filepath=%s\n", exe_filepath);
     printf("run_dir=%s\n", run_dir);
 
